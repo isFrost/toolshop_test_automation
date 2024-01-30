@@ -9,26 +9,22 @@ from selenium.webdriver.edge.service import Service as EdgeService
 
 
 class DriverManager:
+    """Class provides WebDrivers for auto tests"""
     @staticmethod
-    def get_driver(browser='Chrome', version='', window='start-maximized'):
+    def get_driver(browser='Chrome', version=''):
+        """Return WebDriver based on the browser. By default, returns Chrome driver"""
         try:
             if browser == 'Chrome':
-                options = webdriver.ChromeOptions()
                 return webdriver.Chrome(
-                    service=ChromeService(ChromeDriverManager(driver_version=version).install(),
-                                          options=options.add_argument(window))
+                    service=ChromeService(ChromeDriverManager(driver_version=version).install())
                 )
             elif browser == 'Firefox':
-                options = webdriver.FirefoxOptions()
                 return webdriver.Firefox(
-                    service=FirefoxService(GeckoDriverManager(version=version).install(),
-                                           options=options.add_argument(window))
+                    service=FirefoxService(GeckoDriverManager(version=version).install())
                 )
             elif browser == 'Edge':
-                options = webdriver.EdgeOptions()
                 return webdriver.Edge(
-                    service=EdgeService(EdgeChromiumDriverManager(version=version).install(),
-                                        options=options.add_argument(window))
+                    service=EdgeService(EdgeChromiumDriverManager(version=version).install())
                 )
         except WebDriverException as e:
             print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
