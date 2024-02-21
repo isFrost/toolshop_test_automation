@@ -7,3 +7,4 @@ sympy
 pytest-cov
 jsonschema
 selenium
+webdriver_manager
