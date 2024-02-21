@@ -8,3 +8,4 @@ pytest-cov
 jsonschema
 selenium
 webdriver_manager
+pytest
