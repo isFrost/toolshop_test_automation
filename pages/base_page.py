@@ -28,6 +28,13 @@ class BasePage:
         except TimeoutException as e:
             print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
 
+    def wait_for_elements(self, locator, timeout=5):
+        """ Method waits for all located elements to be visible """
+        try:
+            return WebDriverWait(self.driver, timeout).until(EC.visibility_of_all_elements_located(locator))
+        except TimeoutException as e:
+            print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
+
     def wait_for_element_to_be_clickable(self, locator, timeout=5):
         """ Method waits for the element to be clickable """
         try:
@@ -40,6 +47,13 @@ class BasePage:
         element = self.wait_for_element(locator)
         try:
             WebDriverWait(self.driver, timeout).until(lambda driver: element.get_attribute('value') != '')
+        except TimeoutException as e:
+            print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
+
+    def wait_for_url_to_change(self, timeout=5):
+        """ Waits until current URL is changed """
+        try:
+            WebDriverWait(self.driver, timeout).until(EC.url_changes(self.driver.current_url))
         except TimeoutException as e:
             print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
 
