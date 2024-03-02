@@ -11,6 +11,9 @@ class ProductPage(BasePage):
     PRODUCT_TAGS = (By.CLASS_NAME, '.badge')
     RELATED_PRODUCTS = (By.CLASS_NAME, 'card')
     RELATED_PROD_TITLE = (By.CLASS_NAME, 'card-title')
+    INCREASE_QUANTITY = (By.XPATH, '//*[@id="btn-increase-quantity"]')
+    REDUCE_QUANTITY = (By.XPATH, '//*[@id="btn-decrease-quantity"]')
+    ADD_TO_CART_BTN = (By.XPATH, '//*[@id="btn-add-to-cart"]')
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -55,3 +58,23 @@ class ProductPage(BasePage):
             if product['name'] == prod_name:
                 product['element'].click()
         self.wait_for_url_to_change()
+
+    def increase_quantity(self):
+        """ Click on increase button to increase product quantity """
+        increase_btn = self.wait_for_element_to_be_clickable(self.INCREASE_QUANTITY)
+        increase_btn.click()
+
+    def reduce_quantity(self):
+        """ Click on reduce button to reduce product quantity """
+        reduce_btn = self.wait_for_element_to_be_clickable(self.REDUCE_QUANTITY)
+        reduce_btn.click()
+
+    def add_to_cart(self):
+        """ Add product to cart """
+        add_btn = self.wait_for_element_to_be_clickable(self.ADD_TO_CART_BTN)
+        add_btn.click()
+
+    def add_to_cart_disabled(self):
+        """ Check if button Add to Cart is disabled """
+        add_btn = self.wait_for_element(self.ADD_TO_CART_BTN)
+        return True if add_btn.get_attribute('disabled') else False
