@@ -17,6 +17,8 @@ class BasePage:
     RENTALS_BTN = (By.XPATH, '/html/body/app-root/app-header/nav/div/div/ul/li[2]/ul/li[6]/a')
     USER_MENU = (By.XPATH, '//*[@id="user-menu"]')
     SIGN_OUT_BTN = (By.XPATH, '/html/body/app-root/app-header/nav/div/div/ul/li[4]/ul/li[7]/a')
+    CART_BTN = (By.XPATH, '/html/body/app-root/app-header/nav/div/div/ul/li[5]/a')
+    CART_ICON = (By.XPATH, '//*[@id="lblCartCount"]')
 
     def __init__(self, driver):
         self.driver = driver
@@ -118,7 +120,17 @@ class BasePage:
         return user_menu.text if user_menu else None
 
     def logout(self):
-        """ Logout user from the site  """
+        """ Logout user from the site """
         self.expand_user_menu()
         sign_out_btn = self.wait_for_element_to_be_clickable(self.SIGN_OUT_BTN)
         sign_out_btn.click()
+
+    def cart_quantity_from_icon(self):
+        """ Return the quantity of products displayed at cart icon """
+        cart_count = self.wait_for_element(self.CART_ICON)
+        return cart_count.text
+
+    def open_cart(self):
+        """ Open shopping cart """
+        cart_btn = self.wait_for_element(self.CART_BTN)
+        cart_btn.click()
