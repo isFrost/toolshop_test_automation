@@ -15,6 +15,7 @@ class CartPage(BasePage):
     ITEM_XPATH = '/html/body/app-root/div/app-checkout/aw-wizard/div/aw-wizard-step[1]/app-cart/div/table/tbody/tr'
     ITEM_TOTAL_XPATH = '/td[5]/span'
     REMOVE_BTN = (By.CSS_SELECTOR, 'a.btn')
+    PROCEED_BTN = (By.CSS_SELECTOR, 'div.float-end:nth-child(2) > button:nth-child(1)')
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -64,3 +65,8 @@ class CartPage(BasePage):
         for item in items:
             if item.find_element(*self.ITEM_NAME).text.strip() == name:
                 item.find_element(*self.REMOVE_BTN).click()
+
+    def proceed_to_sign_in(self):
+        """ Proceed to sign in screen of order management """
+        proceed_btn = self.wait_for_element(self.PROCEED_BTN, timeout=10)
+        proceed_btn.click()
