@@ -31,7 +31,7 @@ class LoginPage(BasePage):
     def get_error(self):
         """ Get error message for incorrect input """
         error_message = self.wait_for_element(self.ERROR_MESSAGE)
-        return error_message.text
+        return error_message.text if error_message else None
 
     def get_form_title(self):
         """ Get the title of login form """
