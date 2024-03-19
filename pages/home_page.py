@@ -1,3 +1,7 @@
+import time
+
+from selenium.common import TimeoutException
+from selenium.webdriver import ActionChains
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,6 +13,7 @@ class HomePage(BasePage):
     # Locators
     PRODUCT_CARDS = (By.CLASS_NAME, 'card')
     PAGINATION_ITEMS = (By.CSS_SELECTOR, 'ul.pagination li.page-item a')
+    PAGINATION_ITEM_WRAPPER = (By.CSS_SELECTOR, 'ul.pagination li.page-item')
     CARD_IMG = (By.CSS_SELECTOR, 'img.card-img-top')
     CARD_TITLE = (By.CSS_SELECTOR, 'h5.card-title')
     CARD_PRICE = (By.CSS_SELECTOR, '.card-footer span span')
@@ -16,17 +21,27 @@ class HomePage(BasePage):
     SEARCH_BTN = (By.CSS_SELECTOR, 'button.btn:nth-child(3)')
     RESET_SEARCH_BTN = (By.CSS_SELECTOR, 'button.btn:nth-child(2)')
     SEARCH_RESULTS_HEADER = (By.CSS_SELECTOR, '.col-md-9 > h3:nth-child(1)')
-    CATALOG_CONTAINER = (By.CSS_SELECTOR, '.col-md-9 > div:nth-child(2)')
+    CATALOG_CONTAINER = (By.CSS_SELECTOR, 'app-root div.container app-overview div.row div.col-md-9 div.container')
     SORT_INPUT = (By.CSS_SELECTOR, '.form-select')
+    FILTER_CHECKBOXES = (By.CSS_SELECTOR, '#filters .checkbox label')
+    MIN_PRICE_SLIDER = (By.CSS_SELECTOR, '.ngx-slider-pointer-min')
+    MIN_PRICE_VALUE = (By.CSS_SELECTOR, '.ngx-slider-model-value')
+    LOWER_PRICE_LIMIT = (By.CSS_SELECTOR, 'ngx-slider-floor')
+    MAX_PRICE_SLIDER = (By.CSS_SELECTOR, '.ngx-slider-pointer-max')
+    MAX_PRICE_VALUE = (By.CSS_SELECTOR, '.ngx-slider-model-high')
+    HIGHER_PRICE_LIMIT = (By.CSS_SELECTOR, '.ngx-slider-ceil')
 
     def __init__(self, driver):
         super().__init__(driver)
 
     def wait_for_search_to_complete(self, timeout=5, attribute='search_completed'):
         """ Wait until catalog container fains attribute search_completed """
-        WebDriverWait(self.driver, timeout).until(
-            EC.text_to_be_present_in_element_attribute(self.CATALOG_CONTAINER, 'data-test', attribute)
-        )
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                EC.text_to_be_present_in_element_attribute(self.CATALOG_CONTAINER, 'data-test', attribute)
+            )
+        except TimeoutException:
+            print(self.driver.find_element(*self.CATALOG_CONTAINER).get_attribute('data-test'))
 
     def wait_for_search_reset(self, timeout=5):
         """ Wait until search results are reset: container element reloads and visible again """
@@ -38,7 +53,13 @@ class HomePage(BasePage):
             Default timeout for wait is 10s. Custom timeout can be passed as argument
         """
         WebDriverWait(self.driver, timeout).until(
-            EC.staleness_of(self.driver.find_element(*self.PRODUCT_CARDS))
+            EC.staleness_of(self.driver.find_element(*self.CATALOG_CONTAINER))
+        )
+
+    def wait_for_products_to_load(self, timeout=5):
+        cards = self.driver.find_elements(*self.PRODUCT_CARDS)
+        WebDriverWait(self.driver, timeout).until(
+            EC.staleness_of(cards[0])
         )
 
     def go_to_next_page(self):
@@ -46,12 +67,20 @@ class HomePage(BasePage):
         pagination = self.wait_for_elements(self.PAGINATION_ITEMS)
         next_btn = next((i for i in pagination if i.text == '»'), None)
         next_btn.click()
+        self.wait_for_products_to_load()
 
     def go_to_previous_page(self):
         """ Go to the previous page of the product catalog """
         pagination = self.wait_for_elements(self.PAGINATION_ITEMS)
         prev_btn = next((i for i in pagination if i.text == '«'), None)
         prev_btn.click()
+
+    def has_next(self):
+        pagination = self.wait_for_elements(self.PAGINATION_ITEM_WRAPPER)
+        if pagination is None:
+            return False
+        next_btn = next((i for i in pagination if i.text == '»'), None)
+        return False if 'disabled' in next_btn.get_attribute('class') else True
 
     def get_product_cards(self):
         """ Return list of product cards displayed on the current page of product catalog """
@@ -64,28 +93,23 @@ class HomePage(BasePage):
                         'name': card.find_element(*self.CARD_TITLE).text,
                         'img_caption': card.find_element(*self.CARD_IMG).get_attribute('alt'),
                         'price': card.find_element(*self.CARD_PRICE).text,
-                        'element': card
+                        'element': card,
+                        'url': card.get_attribute('href')
                     }
                 )
         return cards_info
 
-    def get_all_product_cards(self):
-        """  Method clicks through all the pages of the catalog and gathers all products as a list of dictionaries """
-        pagination_items = self.wait_for_elements(self.PAGINATION_ITEMS)
-        cards = []
-        for i in range(len(pagination_items) - 2):
-            self.wait_for_next_catalog_page()
-            cards.extend(self.get_product_cards())
-            if i < len(pagination_items) - 3:
-                self.go_to_next_page()
-        return cards
-
-    def open_product(self, name):
+    def open_product(self, name, new_tab=False):
         """ Open product with the specified name """
         cards = self.get_product_cards()
         for card in cards:
             if card['name'] == name:
-                card['element'].click()
+                if new_tab:
+                    self.driver.execute_script('window.open();')
+                    self.driver.switch_to.window(self.driver.window_handles[1])
+                    self.driver.get(card['url'])
+                else:
+                    card['element'].click()
 
     def search_product(self, product):
         """ Return list of product cards after search query is entered """
@@ -122,3 +146,30 @@ class HomePage(BasePage):
         """ Sorts products by price in ascending descending """
         sort_select = Select(self.wait_for_element(self.SORT_INPUT))
         sort_select.select_by_visible_text('Price (Low - High)')
+
+    def filter_products(self, criteria):
+        filter_options = self.wait_for_elements(self.FILTER_CHECKBOXES)
+        for option in filter_options:
+            if criteria in option.text:
+                checkbox = option.find_element(By.CSS_SELECTOR, '.icheck')
+                checkbox.click()
+                self.wait_for_search_to_complete(attribute='filter_completed')
+                break
+
+    def set_max_price(self, price):    # TODO: slider moves too slow, replace with faster method
+        slider = self.wait_for_element(self.MAX_PRICE_SLIDER)
+        current_value = self.wait_for_element(self.MAX_PRICE_VALUE)
+        action = ActionChains(self.driver)
+        step = -2 if float(current_value.text) > price else 2
+        while float(current_value.text) != price:
+            action.click_and_hold(slider).move_by_offset(step, 0).release().perform()
+        time.sleep(2)    # TODO: replace with proper wait
+
+    def set_min_price(self, price):   # TODO: slider moves too slow, replace with faster method
+        slider = self.wait_for_element(self.MIN_PRICE_SLIDER)
+        current_value = self.wait_for_element(self.MIN_PRICE_VALUE)
+        action = ActionChains(self.driver)
+        step = -2 if float(current_value.text) > price else 2
+        while float(current_value.text) != price:
+            action.click_and_hold(slider).move_by_offset(step, 0).release().perform()
+        time.sleep(2)  # TODO: replace with proper wait
