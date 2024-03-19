@@ -8,7 +8,7 @@ class ProductPage(BasePage):
     PRODUCT_PRICE = (By.XPATH, '/html/body/app-root/div/app-detail/div[1]/div[2]/span')
     PRODUCT_DESCRIPTION = (By.XPATH, '//*[@id="description"]')
     PRODUCT_IMG = (By.XPATH, '/html/body/app-root/div/app-detail/div[1]/div[1]/figure/div/img')
-    PRODUCT_TAGS = (By.CLASS_NAME, '.badge')
+    PRODUCT_TAGS = (By.CLASS_NAME, 'badge')
     RELATED_PRODUCTS = (By.CLASS_NAME, 'card')
     RELATED_PROD_TITLE = (By.CLASS_NAME, 'card-title')
     INCREASE_QUANTITY = (By.XPATH, '//*[@id="btn-increase-quantity"]')
@@ -78,3 +78,6 @@ class ProductPage(BasePage):
         """ Check if button Add to Cart is disabled """
         add_btn = self.wait_for_element(self.ADD_TO_CART_BTN)
         return True if add_btn.get_attribute('disabled') else False
+
+    def get_tags(self):
+        return [tag.text for tag in self.wait_for_elements(self.PRODUCT_TAGS)]
