@@ -15,10 +15,11 @@ class BasePage:
     OTHER_TOOLS_CAT = (By.XPATH, '/html/body/app-root/app-header/nav/div/div/ul/li[2]/ul/li[3]/a')
     SPECIAL_TOOLS_CAT = (By.XPATH, '/html/body/app-root/app-header/nav/div/div/ul/li[2]/ul/li[4]/a')
     RENTALS_BTN = (By.XPATH, '/html/body/app-root/app-header/nav/div/div/ul/li[2]/ul/li[6]/a')
-    USER_MENU = (By.XPATH, '//*[@id="user-menu"]')
+    USER_MENU = (By.CSS_SELECTOR, '#menu')
     SIGN_OUT_BTN = (By.XPATH, '/html/body/app-root/app-header/nav/div/div/ul/li[4]/ul/li[7]/a')
     CART_BTN = (By.XPATH, '/html/body/app-root/app-header/nav/div/div/ul/li[5]/a')
     CART_ICON = (By.XPATH, '//*[@id="lblCartCount"]')
+    MESSAGES_MENU_ITEM = (By.CSS_SELECTOR, 'ul.show > li:nth-child(5) > a:nth-child(1)')
 
     def __init__(self, driver):
         self.driver = driver
@@ -113,6 +114,12 @@ class BasePage:
         """ Expand menu under user name """
         user_menu = self.wait_for_element(self.USER_MENU)
         user_menu.click()
+
+    def open_user_messages(self):
+        """ Open user messages """
+        self.expand_user_menu()
+        message_item = self.wait_for_element(self.MESSAGES_MENU_ITEM)
+        message_item.click()
 
     def get_current_user(self):
         """ Get the name of user that is currently logged into the site """
