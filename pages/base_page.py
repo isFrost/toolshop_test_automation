@@ -20,6 +20,7 @@ class BasePage:
     CART_BTN = (By.XPATH, '/html/body/app-root/app-header/nav/div/div/ul/li[5]/a')
     CART_ICON = (By.XPATH, '//*[@id="lblCartCount"]')
     MESSAGES_MENU_ITEM = (By.CSS_SELECTOR, 'ul.show > li:nth-child(5) > a:nth-child(1)')
+    FAVOURITES_MENU_ITEM = (By.CSS_SELECTOR, 'ul.show > li:nth-child(2) > a:nth-child(1)')
 
     def __init__(self, driver):
         self.driver = driver
@@ -141,3 +142,10 @@ class BasePage:
         """ Open shopping cart """
         cart_btn = self.wait_for_element(self.CART_BTN)
         cart_btn.click()
+
+    def open_favourites(self):
+        """ Open list of favourite products by clicking on My Favourites item in the User Menu  """
+        self.expand_user_menu()
+        fav_btn = self.wait_for_element(self.FAVOURITES_MENU_ITEM)
+        fav_btn.click()
+

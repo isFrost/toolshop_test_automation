@@ -14,6 +14,8 @@ class ProductPage(BasePage):
     INCREASE_QUANTITY = (By.XPATH, '//*[@id="btn-increase-quantity"]')
     REDUCE_QUANTITY = (By.XPATH, '//*[@id="btn-decrease-quantity"]')
     ADD_TO_CART_BTN = (By.XPATH, '//*[@id="btn-add-to-cart"]')
+    ADD_TO_FAVOURITES = (By.CSS_SELECTOR, '#btn-add-to-favorites')
+    POPUP = (By.CSS_SELECTOR, '.toast')
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -80,4 +82,14 @@ class ProductPage(BasePage):
         return True if add_btn.get_attribute('disabled') else False
 
     def get_tags(self):
+        """ Return the list of product tags """
         return [tag.text for tag in self.wait_for_elements(self.PRODUCT_TAGS)]
+
+    def add_to_favourites(self):
+        """ Add product to favourite list by clicking Add ot favourites button """
+        add_btn = self.wait_for_element(self.ADD_TO_FAVOURITES)
+        add_btn.click()
+
+    def get_popup(self):
+        """ Return the text of the pop-up message """
+        return self.wait_for_element(self.POPUP).text
