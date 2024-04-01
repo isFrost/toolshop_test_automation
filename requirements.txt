@@ -9,3 +9,4 @@ jsonschema
 selenium
 webdriver_manager
 pytest
+allure-pytest
