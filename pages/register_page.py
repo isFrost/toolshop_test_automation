@@ -23,7 +23,7 @@ class RegisterPage(BasePage):
     PHONE_INPUT = (By.XPATH, '//*[@id="phone"]')
     PHONE_ERROR = (By.XPATH, '/html/body/app-root/div/app-register/div/div/div/form/div/div[9]/div/div')
     EMAIL_INPUT = (By.XPATH, '//*[@id="email"]')
-    EMAIL_ERROR = (By.XPATH, '/html/body/app-root/div/app-register/div/div/div/form/div/div[10]/div/div')
+    EMAIL_ERROR = (By.CSS_SELECTOR, 'div.form-group:nth-child(10) > div:nth-child(3)')
     PASSWORD_INPUT = (By.XPATH, '//*[@id="password"]')
     PASSWORD_ERROR = (By.XPATH, '/html/body/app-root/div/app-register/div/div/div/form/div/div[11]/div')
     REGISTER_BTN = (By.XPATH, '/html/body/app-root/div/app-register/div/div/div/form/div/button')
