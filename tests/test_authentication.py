@@ -9,7 +9,7 @@ from pages.profile_page import ProfilePage
 
 
 class TestAuthentication:
-    @allure.title('Preparation: setup user')
+    @allure.title('Preparation: setup user, get URL, open browser')
     @pytest.fixture(autouse=True)
     def setup(self, setup_teardown):
         self.driver = setup_teardown
@@ -19,11 +19,11 @@ class TestAuthentication:
         self.driver.maximize_window()
 
     @allure.parent_suite('Test Tools Shop')
-    @allure.suite('Authentication')
+    @allure.suite('TS01: Authentication')
     @allure.sub_suite('TC01: Register new user')
     @allure.severity(allure.severity_level.CRITICAL)
-    @allure.link('https://docs.google.com/spreadsheets/d/1ktdpGH0tEea1sl_GIplo943XJddfm8ibyrXEPgCS47s/edit#gid'
-                 '=690712867&range=B2', name='TC01')
+    @allure.link('https://docs.google.com/spreadsheets/d/1ktdpGH0tEea1sl_GIplo943XJddfm8ibyrXEPgCS47s/view#gid'
+                 '=690712867&range=B2', name='TS01TC01')
     def test_register(self):
         home_page = HomePage(self.driver)
         home_page.go_to_signin_page()
@@ -49,11 +49,11 @@ class TestAuthentication:
         DataProvider.set_data('registered_user.json', self.user)
 
     @allure.parent_suite('Test Tools Shop')
-    @allure.suite('Authentication')
+    @allure.suite('TS01: Authentication')
     @allure.sub_suite('TC02: Login as existing user')
     @allure.severity(allure.severity_level.CRITICAL)
     @allure.link('https://docs.google.com/spreadsheets/d/1ktdpGH0tEea1sl_GIplo943XJddfm8ibyrXEPgCS47s/edit#gid'
-                 '=690712867&range=B3', name='TC02')
+                 '=690712867&range=B3', name='TS01TC02')
     def test_login(self):
         self.user = DataProvider.get_data('registered_user.json')
         home_page = HomePage(self.driver)
@@ -74,11 +74,11 @@ class TestAuthentication:
         assert profile_data['country'] == self.user['country_code']
 
     @allure.parent_suite('Test Tools Shop')
-    @allure.suite('Authentication')
+    @allure.suite('TS01: Authentication')
     @allure.sub_suite('TC03: Logout')
     @allure.severity(allure.severity_level.CRITICAL)
     @allure.link('https://docs.google.com/spreadsheets/d/1ktdpGH0tEea1sl_GIplo943XJddfm8ibyrXEPgCS47s/edit#gid'
-                 '=690712867&range=B4', name='TC03')
+                 '=690712867&range=B4', name='TS01TC03')
     def test_logout(self):
         self.user = DataProvider.get_data('registered_user.json')
         home_page = HomePage(self.driver)
@@ -95,11 +95,11 @@ class TestAuthentication:
         assert login_page.get_current_user() is None
 
     @allure.parent_suite('Test Tools Shop')
-    @allure.suite('Authentication')
+    @allure.suite('TS01: Authentication')
     @allure.sub_suite('TC04: Test input verification for registration of new user')
     @allure.severity(allure.severity_level.CRITICAL)
     @allure.link('https://docs.google.com/spreadsheets/d/1ktdpGH0tEea1sl_GIplo943XJddfm8ibyrXEPgCS47s/edit#gid'
-                 '=690712867&range=B5', name='TC04')
+                 '=690712867&range=B5', name='TS01TC04')
     def test_register_with_invalid_input(self):
         self.user = DataProvider.get_data('invalid_user_data.json')
         home_page = HomePage(self.driver)
@@ -122,11 +122,11 @@ class TestAuthentication:
         assert errors.get('password_error') == 'Password is required.'
 
     @allure.parent_suite('Test Tools Shop')
-    @allure.suite('Authentication')
+    @allure.suite('TS01: Authentication')
     @allure.sub_suite('TC05: Attempt to login as non-existing user')
     @allure.severity(allure.severity_level.CRITICAL)
     @allure.link('https://docs.google.com/spreadsheets/d/1ktdpGH0tEea1sl_GIplo943XJddfm8ibyrXEPgCS47s/edit#gid'
-                 '=690712867&range=B6', name='TC05')
+                 '=690712867&range=B6', name='TS01TC05')
     def test_login_non_existing_user(self):
         self.user = DataProvider.get_data('registered_user.json')
         home_page = HomePage(self.driver)
@@ -136,11 +136,11 @@ class TestAuthentication:
         assert login_page.get_error() == 'Invalid email or password'
 
     @allure.parent_suite('Test Tools Shop')
-    @allure.suite('Authentication')
+    @allure.suite('TS01: Authentication')
     @allure.sub_suite('TC06: Attempt to login with invalid password')
     @allure.severity(allure.severity_level.CRITICAL)
     @allure.link('https://docs.google.com/spreadsheets/d/1ktdpGH0tEea1sl_GIplo943XJddfm8ibyrXEPgCS47s/edit#gid'
-                 '=690712867&range=B7', name='TC06')
+                 '=690712867&range=B7', name='TS01TC06')
     def test_login_with_invalid_password(self):
         self.user = DataProvider.get_data('registered_user.json')
         home_page = HomePage(self.driver)
