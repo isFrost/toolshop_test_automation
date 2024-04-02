@@ -2,6 +2,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
+import logging
+import logging.config
 
 
 class BasePage:
@@ -24,42 +26,43 @@ class BasePage:
 
     def __init__(self, driver):
         self.driver = driver
+        logging.getLogger('auto_test_logger').addHandler(logging.FileHandler('../logs/test.log'))
 
-    def wait_for_element(self, locator, timeout=5):
-        """ Method waits for the element to be visible """
+    def wait_for_element(self, locator, timeout=10):
+        """ Wait for the element to be visible """
         try:
             return WebDriverWait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
         except TimeoutException as e:
-            print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
+            logging.getLogger('auto_test_logger').exception(e)
 
-    def wait_for_elements(self, locator, timeout=5):
-        """ Method waits for all located elements to be visible """
+    def wait_for_elements(self, locator, timeout=10):
+        """ Wait for all located elements to be visible """
         try:
             return WebDriverWait(self.driver, timeout).until(EC.visibility_of_all_elements_located(locator))
         except TimeoutException as e:
-            print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
+            logging.getLogger('auto_test_logger').exception(e)
 
-    def wait_for_element_to_be_clickable(self, locator, timeout=5):
-        """ Method waits for the element to be clickable """
+    def wait_for_element_to_be_clickable(self, locator, timeout=10):
+        """ Wait for the element to be clickable """
         try:
             return WebDriverWait(self.driver, timeout).until(EC.element_to_be_clickable(locator))
         except TimeoutException as e:
-            print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
+            logging.getLogger('auto_test_logger').exception(e)
 
-    def wait_until_value_updated(self, locator, timeout=5):
-        """ Waits until the value of the element is updated """
+    def wait_until_value_updated(self, locator, timeout=10):
+        """ Wait until the value of the element is updated """
         element = self.wait_for_element(locator)
         try:
             WebDriverWait(self.driver, timeout).until(lambda driver: element.get_attribute('value') != '')
         except TimeoutException as e:
-            print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
+            logging.getLogger('auto_test_logger').exception(e)
 
-    def wait_for_url_to_change(self, timeout=5):
-        """ Waits until current URL is changed """
+    def wait_for_url_to_change(self, timeout=10):
+        """ Wait until current URL is changed """
         try:
             WebDriverWait(self.driver, timeout).until(EC.url_changes(self.driver.current_url))
         except TimeoutException as e:
-            print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
+            logging.getLogger('auto_test_logger').exception(e)
 
     def go_to_signin_page(self):
         """ Open login page """
@@ -148,4 +151,3 @@ class BasePage:
         self.expand_user_menu()
         fav_btn = self.wait_for_element(self.FAVOURITES_MENU_ITEM)
         fav_btn.click()
-
