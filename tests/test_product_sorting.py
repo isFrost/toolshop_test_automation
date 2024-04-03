@@ -21,8 +21,10 @@ class TestProductSearch:
     def test_alphabetic_sort_asc(self):
         home_page = HomePage(self.driver)
         home_page.sort_alphabetically_asc()
-        products = home_page.get_all_product_cards()
-        print(products[len(products) - 1])
+        products = home_page.get_product_cards()
+        while home_page.has_next():
+            home_page.go_to_next_page()
+            products.extend(home_page.get_product_cards())
         assert products == sorted(products, key=lambda product: product['name'])
 
     @allure.parent_suite('Test Tools Shop')
@@ -34,7 +36,10 @@ class TestProductSearch:
     def test_alphabetic_sort_desc(self):
         home_page = HomePage(self.driver)
         home_page.sort_alphabetically_desc()
-        products = home_page.get_all_product_cards()
+        products = home_page.get_product_cards()
+        while home_page.has_next():
+            home_page.go_to_next_page()
+            products.extend(home_page.get_product_cards())
         assert products == sorted(products, key=lambda product: product['name'], reverse=True)
 
     @allure.parent_suite('Test Tools Shop')
@@ -46,7 +51,10 @@ class TestProductSearch:
     def test_price_sort_asc(self):
         home_page = HomePage(self.driver)
         home_page.sort_price_asc()
-        products = home_page.get_all_product_cards()
+        products = home_page.get_product_cards()
+        while home_page.has_next():
+            home_page.go_to_next_page()
+            products.extend(home_page.get_product_cards())
         assert products == sorted(products, key=lambda product: float(product['price'][1:]))
 
     @allure.parent_suite('Test Tools Shop')
@@ -58,5 +66,8 @@ class TestProductSearch:
     def test_price_sort_desc(self):
         home_page = HomePage(self.driver)
         home_page.sort_price_desc()
-        products = home_page.get_all_product_cards()
+        products = home_page.get_product_cards()
+        while home_page.has_next():
+            home_page.go_to_next_page()
+            products.extend(home_page.get_product_cards())
         assert products == sorted(products, key=lambda product: float(product['price'][1:]), reverse=True)

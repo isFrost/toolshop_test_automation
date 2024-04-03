@@ -145,21 +145,25 @@ class HomePage(BasePage):
         """ Sorts products by name in ascending order """
         sort_select = Select(self.wait_for_element(self.SORT_INPUT))
         sort_select.select_by_visible_text('Name (A - Z)')
+        self.wait_for_search_to_complete(attribute='sorting_completed')
 
     def sort_alphabetically_desc(self):
         """ Sorts products by name in descending order """
         sort_select = Select(self.wait_for_element(self.SORT_INPUT))
         sort_select.select_by_visible_text('Name (Z - A)')
+        self.wait_for_search_to_complete(attribute='sorting_completed')
 
     def sort_price_desc(self):
         """ Sorts products by price in ascending order """
         sort_select = Select(self.wait_for_element(self.SORT_INPUT))
         sort_select.select_by_visible_text('Price (High - Low)')
+        self.wait_for_search_to_complete(attribute='sorting_completed')
 
     def sort_price_asc(self):
         """ Sorts products by price in ascending descending """
         sort_select = Select(self.wait_for_element(self.SORT_INPUT))
         sort_select.select_by_visible_text('Price (Low - High)')
+        self.wait_for_search_to_complete(attribute='sorting_completed')
 
     def filter_products(self, criteria):
         filter_options = self.wait_for_elements(self.FILTER_CHECKBOXES)
