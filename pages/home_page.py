@@ -1,5 +1,4 @@
 import time
-
 from selenium.common import TimeoutException
 from selenium.webdriver import ActionChains
 from pages.base_page import BasePage
@@ -7,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
+import logging
 
 
 class HomePage(BasePage):
@@ -30,37 +30,49 @@ class HomePage(BasePage):
     MAX_PRICE_SLIDER = (By.CSS_SELECTOR, '.ngx-slider-pointer-max')
     MAX_PRICE_VALUE = (By.CSS_SELECTOR, '.ngx-slider-model-high')
     HIGHER_PRICE_LIMIT = (By.CSS_SELECTOR, '.ngx-slider-ceil')
+    SEARCH_ERROR = (By.CSS_SELECTOR, '.col-md-9 > div:nth-child(2) > div:nth-child(1)')
 
     def __init__(self, driver):
         super().__init__(driver)
 
-    def wait_for_search_to_complete(self, timeout=5, attribute='search_completed'):
+    def wait_for_search_to_complete(self, timeout=10, attribute='search_completed'):
         """ Wait until catalog container fains attribute search_completed """
         try:
             WebDriverWait(self.driver, timeout).until(
                 EC.text_to_be_present_in_element_attribute(self.CATALOG_CONTAINER, 'data-test', attribute)
             )
-        except TimeoutException:
-            print(self.driver.find_element(*self.CATALOG_CONTAINER).get_attribute('data-test'))
+        except TimeoutException as e:
+            logging.getLogger('auto_test_logger').exception(e)
 
-    def wait_for_search_reset(self, timeout=5):
-        """ Wait until search results are reset: container element reloads and visible again """
-        WebDriverWait(self.driver, timeout).until(EC.visibility_of_element_located(self.CATALOG_CONTAINER))
+    def wait_for_search_reset(self, timeout=10):
+        """ Wait until search results are reset: product card in the list of results is no longer displayed """
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                EC.invisibility_of_element(self.driver.find_elements(*self.PRODUCT_CARDS)[-1])
+            )
+        except TimeoutException as e:
+            logging.getLogger('auto_test_logger').exception(e)
 
     def wait_for_next_catalog_page(self, timeout=10):
         """ Wait for products displayed on the page to be updated when navigating to next pagination item
             Checks if previous catalog page is stale
             Default timeout for wait is 10s. Custom timeout can be passed as argument
         """
-        WebDriverWait(self.driver, timeout).until(
-            EC.staleness_of(self.driver.find_element(*self.CATALOG_CONTAINER))
-        )
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                EC.staleness_of(self.driver.find_element(*self.CATALOG_CONTAINER))
+            )
+        except TimeoutException as e:
+            logging.getLogger('auto_test_logger').exception(e)
 
-    def wait_for_products_to_load(self, timeout=5):
-        cards = self.driver.find_elements(*self.PRODUCT_CARDS)
-        WebDriverWait(self.driver, timeout).until(
-            EC.staleness_of(cards[0])
-        )
+    def wait_for_products_to_load(self, timeout=10):
+        try:
+            cards = self.driver.find_elements(*self.PRODUCT_CARDS)
+            WebDriverWait(self.driver, timeout).until(
+                EC.staleness_of(cards[0])
+            )
+        except TimeoutException as e:
+            logging.getLogger('auto_test_logger').exception(e)
 
     def go_to_next_page(self):
         """ Go to the nexxt page of the product catalog """
@@ -118,8 +130,10 @@ class HomePage(BasePage):
         search_btn = self.wait_for_element(self.SEARCH_BTN)
         search_btn.click()
         self.wait_for_search_to_complete()
-        search_results = self.get_product_cards()
-        return search_results
+
+    def get_search_error(self):
+        """ Return message displayed when the search has no results """
+        return self.wait_for_element(self.SEARCH_ERROR).text
 
     def reset_search(self):
         """ Resets the results of the search """

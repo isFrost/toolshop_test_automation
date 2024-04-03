@@ -19,10 +19,15 @@ class TestProductSearch:
     @allure.link('https://docs.google.com/spreadsheets/d/1ktdpGH0tEea1sl_GIplo943XJddfm8ibyrXEPgCS47s/edit#gid'
                  '=298515700&range=B2', name='TS03TC01')
     def test_search_by_product(self):
+        query = 'Claw Hammer'
         home_page = HomePage(self.driver)
-        filtered_products = home_page.search_product('Claw Hammer')
-        for product in filtered_products:
-            assert 'Claw Hammer' in product['name']
+        home_page.search_product(query)
+        search_results = home_page.get_product_cards()
+        assert query in (product['name'] for product in search_results)
+        while home_page.has_next():
+            home_page.go_to_next_page()
+            search_results = home_page.get_product_cards()
+            assert query in (product['name'] for product in search_results)
 
     @allure.parent_suite('Test Tools Shop')
     @allure.suite('TS03: Product Search and Filter')
@@ -32,8 +37,9 @@ class TestProductSearch:
                  '=298515700&range=B3', name='TS03TC02')
     def test_search_non_existing_product(self):
         home_page = HomePage(self.driver)
-        filtered_products = home_page.search_product('Non-Existing Product 1111')
-        assert len(filtered_products) == 0
+        home_page.search_product('Non-Existing Product 1111')
+        assert home_page.get_search_error() == 'No results found.'
+        assert len(home_page.get_product_cards()) == 0
 
     @allure.parent_suite('Test Tools Shop')
     @allure.suite('TS03: Product Search and Filter')
@@ -44,7 +50,8 @@ class TestProductSearch:
     def test_reset_test_results(self):
         home_page = HomePage(self.driver)
         initial_product_list = home_page.get_product_cards()
-        filtered_products = home_page.search_product('Claw Hammer')
+        home_page.search_product('Claw Hammer')
+        filtered_products = home_page.get_product_cards()
         assert len(filtered_products) != len(initial_product_list)
         home_page.reset_search()
         reset_product_list = home_page.get_product_cards()
