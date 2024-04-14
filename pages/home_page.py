@@ -24,10 +24,13 @@ class HomePage(BasePage):
     CATALOG_CONTAINER = (By.CSS_SELECTOR, 'app-root div.container app-overview div.row div.col-md-9 div.container')
     SORT_INPUT = (By.CSS_SELECTOR, '.form-select')
     FILTER_CHECKBOXES = (By.CSS_SELECTOR, '#filters .checkbox label')
-    MIN_PRICE_SLIDER = (By.CSS_SELECTOR, '.ngx-slider-pointer-min')
+    #MIN_PRICE_SLIDER = (By.CSS_SELECTOR, '.ngx-slider-pointer-min')
+    MIN_PRICE_SLIDER = (By.CSS_SELECTOR, 'span.ngx-slider-span:nth-child(5)')
     MIN_PRICE_VALUE = (By.CSS_SELECTOR, '.ngx-slider-model-value')
+    SLIDER_BAR = (By.CSS_SELECTOR, '.ngx-slider-full-bar')
     LOWER_PRICE_LIMIT = (By.CSS_SELECTOR, 'ngx-slider-floor')
-    MAX_PRICE_SLIDER = (By.CSS_SELECTOR, '.ngx-slider-pointer-max')
+    #MAX_PRICE_SLIDER = (By.CSS_SELECTOR, '.ngx-slider-pointer-max')
+    MAX_PRICE_SLIDER = (By.CSS_SELECTOR, 'span.ngx-slider-span:nth-child(6)')
     MAX_PRICE_VALUE = (By.CSS_SELECTOR, '.ngx-slider-model-high')
     HIGHER_PRICE_LIMIT = (By.CSS_SELECTOR, '.ngx-slider-ceil')
     SEARCH_ERROR = (By.CSS_SELECTOR, '.col-md-9 > div:nth-child(2) > div:nth-child(1)')
@@ -166,6 +169,7 @@ class HomePage(BasePage):
         self.wait_for_search_to_complete(attribute='sorting_completed')
 
     def filter_products(self, criteria):
+        """ Filters products by the provided criteria """
         filter_options = self.wait_for_elements(self.FILTER_CHECKBOXES)
         for option in filter_options:
             if criteria in option.text:
@@ -174,20 +178,22 @@ class HomePage(BasePage):
                 self.wait_for_search_to_complete(attribute='filter_completed')
                 break
 
-    def set_max_price(self, price):    # TODO: slider moves too slow, replace with faster method
-        slider = self.wait_for_element(self.MAX_PRICE_SLIDER)
-        current_value = self.wait_for_element(self.MAX_PRICE_VALUE)
-        action = ActionChains(self.driver)
-        step = -2 if float(current_value.text) > price else 2
-        while float(current_value.text) != price:
-            action.click_and_hold(slider).move_by_offset(step, 0).release().perform()
-        time.sleep(2)    # TODO: replace with proper wait
-
-    def set_min_price(self, price):   # TODO: slider moves too slow, replace with faster method
-        slider = self.wait_for_element(self.MIN_PRICE_SLIDER)
-        current_value = self.wait_for_element(self.MIN_PRICE_VALUE)
-        action = ActionChains(self.driver)
-        step = -2 if float(current_value.text) > price else 2
-        while float(current_value.text) != price:
-            action.click_and_hold(slider).move_by_offset(step, 0).release().perform()
+    def set_price_limit(self, price, limit='max'):
+        """ Sets max or min price limit to the provided price. Foe limit=max is provided sets upper price limit,
+            for other values e.g. limit=min sets lover price limit """
+        slider = {'price': self.MAX_PRICE_VALUE, 'pointer': self.MAX_PRICE_SLIDER} if limit == 'max' \
+            else {'price': self.MIN_PRICE_VALUE, 'pointer': self.MIN_PRICE_SLIDER}   # select min or max slider
+        step = int(self.wait_for_element(self.SLIDER_BAR).size['width'])    # initialize slider step
+        pointer = self.wait_for_element(slider['pointer'])    # get slider pointer
+        value = int(self.wait_for_element(slider['price']).text)    # get current price of the slider
+        action = ActionChains(self.driver)    # initialize action object
+        while value != price:    # move slider until required value is set
+            action.click_and_hold(pointer).move_by_offset(step, 0).release().perform()  # move slider by the step
+            value = int(self.wait_for_element(slider['price']).text)  # get current price of the slider
+            if value < price:
+                step = abs(step / 2) if abs(step / 2) > 2 else 2
+            else:
+                step = -abs(step / 2) if abs(step / 2) > 2 else -2   # if updated price is larger the
+            # required price divide step by 2 and make the value negative to move slider to the right, if less set
+            # positive value to move slider to the left, then repeat the cycle
         time.sleep(2)  # TODO: replace with proper wait
