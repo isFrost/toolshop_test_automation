@@ -1,4 +1,3 @@
-import time
 import pytest
 import allure
 from utils.data_provider import DataProvider
@@ -65,7 +64,6 @@ class TestProductSearch:
         rental_page.add_to_cart()
         rental_page.open_cart()
         cart_page = CartPage(self.driver)
-        time.sleep(3)    # TODO: replace with proper wait
         cart_item = cart_page.get_cart_items()[0]
         assert cart_item['name'] == rental['name']
         assert int(cart_item['quantity']) == 3
@@ -89,9 +87,7 @@ class TestProductSearch:
         rental_page.add_to_cart()
         rental_page.open_cart()
         cart_page = CartPage(self.driver)
-        time.sleep(3)  # TODO: replace with proper wait
         cart_item = cart_page.get_cart_items()[0]
         assert cart_item['name'] == rental['name']
         cart_page.remove_item(rental['name'])
-        time.sleep(3)  # TODO: replace with proper wait
         assert cart_page.get_cart_items() is None

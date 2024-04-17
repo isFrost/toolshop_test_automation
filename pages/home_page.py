@@ -1,4 +1,3 @@
-import time
 from selenium.common import TimeoutException
 from selenium.webdriver import ActionChains
 from pages.base_page import BasePage
@@ -24,12 +23,10 @@ class HomePage(BasePage):
     CATALOG_CONTAINER = (By.CSS_SELECTOR, 'app-root div.container app-overview div.row div.col-md-9 div.container')
     SORT_INPUT = (By.CSS_SELECTOR, '.form-select')
     FILTER_CHECKBOXES = (By.CSS_SELECTOR, '#filters .checkbox label')
-    #MIN_PRICE_SLIDER = (By.CSS_SELECTOR, '.ngx-slider-pointer-min')
     MIN_PRICE_SLIDER = (By.CSS_SELECTOR, 'span.ngx-slider-span:nth-child(5)')
     MIN_PRICE_VALUE = (By.CSS_SELECTOR, '.ngx-slider-model-value')
     SLIDER_BAR = (By.CSS_SELECTOR, '.ngx-slider-full-bar')
     LOWER_PRICE_LIMIT = (By.CSS_SELECTOR, 'ngx-slider-floor')
-    #MAX_PRICE_SLIDER = (By.CSS_SELECTOR, '.ngx-slider-pointer-max')
     MAX_PRICE_SLIDER = (By.CSS_SELECTOR, 'span.ngx-slider-span:nth-child(6)')
     MAX_PRICE_VALUE = (By.CSS_SELECTOR, '.ngx-slider-model-high')
     HIGHER_PRICE_LIMIT = (By.CSS_SELECTOR, '.ngx-slider-ceil')
@@ -196,4 +193,3 @@ class HomePage(BasePage):
                 step = -abs(step / 2) if abs(step / 2) > 2 else -2   # if updated price is larger the
             # required price divide step by 2 and make the value negative to move slider to the right, if less set
             # positive value to move slider to the left, then repeat the cycle
-        time.sleep(2)  # TODO: replace with proper wait

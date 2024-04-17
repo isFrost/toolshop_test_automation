@@ -3,11 +3,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
+import logging
 
 
 class CartPage(BasePage):
     # Locators
     ITEM = (By.CSS_SELECTOR, '.table > tbody > tr')
+    APP_CART = (By.CSS_SELECTOR, '.wizard-steps > aw-wizard-step:nth-child(1) > app-cart:nth-child(1)')
     ITEM_NAME = (By.CLASS_NAME, 'product-title')
     ITEM_QUANTITY = (By.CLASS_NAME, 'quantity')
     ITEM_PRICE = (By.CSS_SELECTOR, 'td:nth-child(4)')
@@ -31,7 +33,12 @@ class CartPage(BasePage):
                         EC.none_of(EC.text_to_be_present_in_element((By.XPATH, xpath), initial_text))
                     )
                 except TimeoutError as e:
-                    print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
+                    logging.getLogger('auto_test_logger').exception(e)
+
+    def wait_for_item_to_be_removed(self, element):
+        WebDriverWait(self.driver, timeout=5).until(
+            EC.invisibility_of_element(element)
+        )
 
     def get_cart_items(self):
         """ Get all the items displayed in the cart """
@@ -65,6 +72,7 @@ class CartPage(BasePage):
         for item in items:
             if item.find_element(*self.ITEM_NAME).text.strip() == name:
                 item.find_element(*self.REMOVE_BTN).click()
+                self.wait_for_item_to_be_removed(item)
 
     def proceed_to_sign_in(self):
         """ Proceed to sign in screen of order management """
