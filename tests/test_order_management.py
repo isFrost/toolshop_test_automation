@@ -72,7 +72,7 @@ class TestOrderManagement:
     @allure.severity(allure.severity_level.CRITICAL)
     @allure.link('https://docs.google.com/spreadsheets/d/1ktdpGH0tEea1sl_GIplo943XJddfm8ibyrXEPgCS47s/edit#gid'
                  '=495501177&range=B4', name='TS05TC04')
-    @pytest.mark.xfail
+    @pytest.mark.skip(reason='Functionality is not yet supported by the site')
     def test_remove_items_on_order_confirmation(self):
         home_page = LoginHelper.login(self.driver, self.user)
         products = home_page.get_product_cards()

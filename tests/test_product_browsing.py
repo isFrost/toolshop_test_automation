@@ -1,4 +1,3 @@
-import time
 import pytest
 import allure
 from utils.data_provider import DataProvider
@@ -73,7 +72,6 @@ class TestProductBrowsing:
         home_page = HomePage(self.driver)
         initial_page_products = home_page.get_product_cards()
         home_page.go_to_next_page()
-        time.sleep(3)    # TODO: replace with proper wait
         next_page_products = home_page.get_product_cards()
         i = 0
         while i < len(initial_page_products):
@@ -82,7 +80,6 @@ class TestProductBrowsing:
             assert initial_page_products[i]['price'] != next_page_products[i]['price']
             i += 1
         home_page.go_to_previous_page()
-        time.sleep(3)    # TODO: replace with proper wait
         next_page_products = home_page.get_product_cards()
         while i < len(initial_page_products):
             assert initial_page_products[i]['name'] == next_page_products[i]['name']

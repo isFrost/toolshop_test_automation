@@ -1,4 +1,3 @@
-import time
 import allure
 from utils.driver_manager import DriverManager as DM
 
@@ -12,7 +11,6 @@ class TestDriver:
         """Test that Chrome driver is working"""
         driver = DM.get_driver()
         driver.get('https://google.com')
-        time.sleep(3)
         assert driver.title == 'Google'
         driver.quit()
 
@@ -24,7 +22,6 @@ class TestDriver:
         """Test that Firefox driver is working"""
         driver = DM.get_driver('Firefox')
         driver.get('https://google.com')
-        time.sleep(3)
         assert driver.title == 'Google'
         driver.quit()
 
@@ -36,6 +33,5 @@ class TestDriver:
         """Test that Edge driver is working"""
         driver = DM.get_driver('Edge')
         driver.get('https://google.com')
-        time.sleep(3)
         assert driver.title == 'Google'
         driver.quit()
