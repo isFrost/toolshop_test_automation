@@ -152,4 +152,4 @@ class TestFiltering:
             home_page.go_to_next_page()
             products = home_page.get_product_cards()
             for product in products:
-                assert float(product['price'][1:]) <= 120.0
+                assert float(product['price'][1:]) >= 120.0
