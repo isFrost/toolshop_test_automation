@@ -54,7 +54,6 @@ class TestCartManagement:
         items = cart_page.get_cart_items()
         assert items[0]['name'] == product['name']
         cart_page.remove_item(product['name'])
-        cart_page.wait_for_total_to_update(product['name'], items[0]['total'])
         items = cart_page.get_cart_items()
         assert items is None
 

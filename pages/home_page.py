@@ -96,7 +96,7 @@ class HomePage(BasePage):
 
     def get_product_cards(self):
         """ Return list of product cards displayed on the current page of product catalog """
-        cards = self.wait_for_elements(self.PRODUCT_CARDS)
+        cards = self.wait_for_elements(self.PRODUCT_CARDS, timeout=5)
         cards_info = []
         if cards:
             for card in cards:
