@@ -31,14 +31,6 @@ pipeline {
             steps {
                 // generate Allure report
                 sh "allure generate allure-results -o allure-report"
-                // publish Allure report
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    properties: [],
-                    reportBuildPolicy: 'ALWAYS',
-                    results: [[path: 'allure-results']]
-                ])
             }
         }
     }
