@@ -26,14 +26,13 @@ pipeline {
                 script {
                     try {
                         sh "ls"
-                        sh ".venv/bin/python3 -m pytest tests alluredir=allure-results"
+                        sh ".venv/bin/python3 -m pytest tests --alluredir=allure-results"
                     }
                     catch (Exception e) {
                         echo "Exception occurred " + e.toString()
                         sh "exit 0"
                     }
                 }
-                sh "pytest /tests"
             }
             post {
                 always {
