@@ -22,7 +22,7 @@ class DriverManager:
                 options.add_argument('user-agent=Chrome')
                 options.add_argument('--window-size=1920,1080')
                 return webdriver.Chrome(
-                    service=ChromeService(ChromeDriverManager(driver_version=version).install()),
+                    service=ChromeService(ChromeDriverManager().install()),
                     options=options
                 )
 
