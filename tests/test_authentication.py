@@ -109,7 +109,7 @@ class TestAuthentication:
         register_page = RegisterPage(self.driver)
         register_page.register_user(self.user)
         errors = register_page.get_errors()
-        assert errors.get('first_name_error') == 'First name is required.'
+        assert errors.get('first_name_error') == 'First name is required'
         assert errors.get('last_name_error') == 'Last name is required.'
         assert errors.get('birth_date_error') == 'Date of Birth is required.'
         assert errors.get('address_error') == 'Address is required.'

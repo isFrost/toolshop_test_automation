@@ -15,7 +15,7 @@ class ProductPage(BasePage):
     REDUCE_QUANTITY = (By.XPATH, '//*[@id="btn-decrease-quantity"]')
     ADD_TO_CART_BTN = (By.XPATH, '//*[@id="btn-add-to-cart"]')
     ADD_TO_FAVOURITES = (By.CSS_SELECTOR, '#btn-add-to-favorites')
-    POPUP = (By.CSS_SELECTOR, '.toast')
+    POPUP = (By.CSS_SELECTOR, 'div#toast-container div')
 
     def __init__(self, driver):
         super().__init__(driver)
