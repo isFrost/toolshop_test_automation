@@ -23,11 +23,13 @@ class TestProductSearch:
         home_page = HomePage(self.driver)
         home_page.search_product(query)
         search_results = home_page.get_product_cards()
-        assert query in (product['name'] for product in search_results)
+        for product in search_results:
+            assert query in product['name']
         while home_page.has_next():
             home_page.go_to_next_page()
             search_results = home_page.get_product_cards()
-            assert query in (product['name'] for product in search_results)
+            for product in search_results:
+                assert query in product['name']
 
     @allure.parent_suite('Test Tools Shop')
     @allure.suite('TS03: Product Search and Filter')
@@ -38,7 +40,7 @@ class TestProductSearch:
     def test_search_non_existing_product(self):
         home_page = HomePage(self.driver)
         home_page.search_product('Non-Existing Product 1111')
-        assert home_page.get_search_error() == 'No results found.'
+        assert home_page.get_search_error() == 'There are no products found.'
         assert len(home_page.get_product_cards()) == 0
 
     @allure.parent_suite('Test Tools Shop')

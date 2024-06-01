@@ -78,7 +78,6 @@ class TestCartManagement:
         assert items[0]['price'] == product['price']
         assert items[0]['total'] == product['price']
         cart_page.set_item_quantity(product['name'], 3)
-        cart_page.wait_for_total_to_update(product['name'], items[0]['total'])
         items = cart_page.get_cart_items()
         assert items[0]['quantity'] == '3'
         assert items[0]['total'] == f'${round(float(product["price"][1:]) * 3, 2)}'
