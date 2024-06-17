@@ -1,3 +1,5 @@
+import time
+
 import pytest
 import allure
 from utils.data_provider import DataProvider
@@ -145,6 +147,7 @@ class TestFiltering:
         home_page = HomePage(self.driver)
         home_page.set_price_limit(120, limit='min')
         home_page.set_price_limit(200, limit='max')
+        # time.sleep(3)
         products = home_page.get_product_cards()
         for product in products:
             assert float(product['price'][1:]) >= 120.0

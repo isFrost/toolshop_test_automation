@@ -190,6 +190,7 @@ class HomePage(BasePage):
             if value < price:
                 step = abs(step / 2) if abs(step / 2) > 2 else 2
             else:
-                step = -abs(step / 2) if abs(step / 2) > 2 else -2   # if updated price is larger the
-            # required price divide step by 2 and make the value negative to move slider to the right, if less set
+                step = -abs(step / 2) if abs(step / 2) > 2 else -2   # if updated price is larger then
+            # required price divide step by 2 and make the value negative to move slider to the right, if less - set
             # positive value to move slider to the left, then repeat the cycle
+        self.wait_for_products_to_load()

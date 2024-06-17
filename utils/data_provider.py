@@ -1,12 +1,13 @@
 import json
 import time
-from os import path
+import os
 
 
 class DataProvider:
     @staticmethod
     def get_data(file_name):
-        file_path = path.join('..\\test_data', file_name)
+        file_path = os.path.join(os.path.dirname(__file__), '..', 'test_data', file_name)
+        file_path = os.path.abspath(file_path)
         with open(file_path, 'r') as f:
             data = json.load(f)
         return data
@@ -17,6 +18,7 @@ class DataProvider:
 
     @staticmethod
     def set_data(file_name, data):
-        file_path = path.join('..\\test_data', file_name)
+        file_path = os.path.join(os.path.dirname(__file__), '..', 'test_data', file_name)
+        file_path = os.path.abspath(file_path)
         with open(file_path, 'w') as f:
             json.dump(data, f, indent=4)

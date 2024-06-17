@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 
 class AccountPage(BasePage):
     # Locators
-    PROFILE_BTN = (By.XPATH, '/html/body/app-root/div/app-overview/div/a[2]')
+    PROFILE_BTN = (By.CSS_SELECTOR, 'body > app-root > div > app-overview > div > a:nth-child(2)')
 
     def __init__(self, driver):
         super().__init__(driver)
