@@ -1,3 +1,5 @@
+import logging
+
 from selenium import webdriver
 from selenium.common import WebDriverException
 from selenium.webdriver.firefox.options import Options
@@ -35,3 +37,6 @@ class DriverManager:
                 return webdriver.Edge(options=options)
         except WebDriverException as e:
             print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
+            logger = logging.getLogger('Selenium')
+            logger.exception(e)
+            
