@@ -20,23 +20,25 @@ class DriverManager:
                 options.add_argument('--no-sandbox')
                 # options.add_argument('user-agent=Chrome')
                 options.add_argument('--window-size=1920,1080')
-                return webdriver.Chrome(options=options)
+                service = webdriver.ChromeService()
+                return webdriver.Chrome(service=service, options=options)
             elif browser == 'Firefox':
                 options = webdriver.FirefoxOptions()
                 options.add_argument('--headless')
                 options.add_argument('--disable-gpu')
                 options.add_argument('--no-sandbox')
                 options.add_argument('--window-size=1920,1080')
-                return webdriver.Firefox(options=options)
+                service = webdriver.FirefoxService()
+                return webdriver.Firefox(service=service, options=options)
             elif browser == 'Edge':
                 options = webdriver.EdgeOptions()
                 options.add_argument('--headless=new')
                 options.add_argument('--disable-gpu')
                 options.add_argument('--no-sandbox')
                 options.add_argument('--window-size=1920,1080')
-                return webdriver.Edge(options=options)
+                service = webdriver.EdgeService()
+                return webdriver.Edge(service=service, options=options)
         except WebDriverException as e:
             print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
             logger = logging.getLogger('Selenium')
             logger.exception(e)
-            
