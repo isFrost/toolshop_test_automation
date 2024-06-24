@@ -1,47 +1,48 @@
-# Get Jenkins image
-FROM jenkins/jenkins:lts
+# get basic os image
+FROM ubuntu:22.04
 
 # Switch to root user to install necessary components
 USER root
 
-# Install python
-RUN apt-get update
+# Install python, wget, gpg, git
+RUN apt update
 RUN apt-get install -y python3 python3-venv pip virtualenv
+RUN apt install -y wget
+RUN apt install -y gnupg2
+RUN apt install -y git
 
-# Install custom plugins
-RUN jenkins-plugin-cli --plugins allure-jenkins-plugin:2.31.1 build-timeout:1.32 github-branch-source:1789.v5b_0c0cea_18c3
+# Install Java (required for jenkins)
+RUN apt update && apt install -y openjdk-11-jdk
 
-# Install wget
-RUN apt-get install -y wget
-
-# Set non-interactive mode for installation
-ENV DEBIAN_FRONTEND=noninteractive
+# Install Jenkins
+RUN wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+RUN echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+    https://pkg.jenkins.io/debian-stable binary/ | tee \
+    /etc/apt/sources.list.d/jenkins.list > /dev/null
+RUN apt update
+RUN apt install -y jenkins
 
 # Detect architecture and install appropriate Chrome
 RUN ARCH=$(uname -m) && \
-    if [ $ARCH = "x86_64" ]; then \
-        wget -O /tmp/google-chrome.deb ttps://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb; \
-    elif [ $ARCH = "aarch64"] || [ $ARCH = "arm64"]; then \
+    if [ "$ARCH" = "x86_64" ]; then \
+        wget -O /tmp/google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb; \
+    elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then \
         wget -O /tmp/google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_arm64.deb; \
     else \
         echo "Unsupported architecture: $ARCH" && exit 1; \
     fi && \
-    sudo dpkg -i /tmp/google-chrome.deb || sudo apt-get install -f -y
+    dpkg -i /tmp/google-chrome.deb || apt install -f -y
 
-# Detect architecture and install appropriate Firefox
+# Install Firefox
 RUN ARCH=$(uname -m) && \
-    if [ $ARCH = "x86_64" ]; then \
-        wget -O /tmp/firefox.tar.bz2 https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US; \
-    elif [ $ARCH = "aarch64" ]; then \
-        wget -O /tmp/firefox.tar.bz2 https://download.mozilla.org/?product=firefox-latest&os=linux-aarch64&lang=en-US; \
+    if [ "$ARCH" = "arm64" ]; then \
+        apt install -y firefox:arm64; \
     else \
-        echo "Unsupported architecture: $ARCH" && exit 1; \
-    fi && \
-    tar -xjf /tmp/firefox.tar.bz2 -C /opt/ && \
-    ln -sf /opt/firefox/firefox /usr/bin/firefox
+        apt install -y firefox; \
+    fi
 
-# Clean up
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Expose Jenkins port
+EXPOSE 8080
 
-# Switch to Jenkins
-USER jenkins
+# Start Jenkins service
+CMD ["jenkins"]

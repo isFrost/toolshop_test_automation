@@ -1,10 +1,6 @@
 import logging
-
 from selenium import webdriver
 from selenium.common import WebDriverException
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.edge.service import Service as EdgeService
 
 
 class DriverManager:
@@ -18,7 +14,6 @@ class DriverManager:
                 options.add_argument('--headless')
                 options.add_argument('--disable-gpu')
                 options.add_argument('--no-sandbox')
-                # options.add_argument('user-agent=Chrome')
                 options.add_argument('--window-size=1920,1080')
                 service = webdriver.ChromeService()
                 return webdriver.Chrome(service=service, options=options)
@@ -39,6 +34,5 @@ class DriverManager:
                 service = webdriver.EdgeService()
                 return webdriver.Edge(service=service, options=options)
         except WebDriverException as e:
-            print(f'Error: {e}')  # TODO: Add proper logging for errors and info messages
             logger = logging.getLogger('Selenium')
             logger.exception(e)
