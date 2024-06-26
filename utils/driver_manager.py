@@ -34,5 +34,4 @@ class DriverManager:
                 service = webdriver.EdgeService()
                 return webdriver.Edge(service=service, options=options)
         except WebDriverException as e:
-            logger = logging.getLogger('Selenium')
-            logger.exception(e)
+            logging.getLogger('auto_test_logger').exception(e)
