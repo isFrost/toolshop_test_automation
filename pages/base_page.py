@@ -26,7 +26,7 @@ class BasePage:
 
     def __init__(self, driver):
         self.driver = driver
-        logging.getLogger('auto_test_logger').addHandler(logging.FileHandler('../logs/test.log'))
+        logging.getLogger('auto_test_logger').addHandler(logging.FileHandler('test.log'))
 
     def wait_for_element(self, locator, timeout=10):
         """ Wait for the element to be visible """
