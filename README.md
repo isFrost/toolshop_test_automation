@@ -14,16 +14,20 @@ Auto tests are based on the manual tests listed in the following spreadsheet: [L
 - [Installation](#Installation)
 - [Continuous Integration](#Continuous-Integration)
 - [Project Structure](#Project-Structure)
-- [Running Tests from command line]
-- [Notes]
-- [Contributing]
-- [License]
+- [Running Tests from command line](#Running-Tests-from-command-line)
+- [Notes](#Notes)
+- [Contributing](#Contributing)
+- [License](#License)
 
 ## Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
 
 - Docker Desktop
+
+To run outside docker container:
+- Python 3.x
+- Pip
 
 ## Installation
 
@@ -47,7 +51,7 @@ docker container run -d -p 8080:8080 --name toolshop toolshop
 ## Continuous Integration
 This project uses Jenkins for continuous integration. The Jenkins pipeline is defined in the Jenkinsfile.
 
-Set up a Jenkins job and configure it to use the repository.
+### Set up a Jenkins job and configure it to use the repository.
 
 Once the docker container with the project is up and running open web browser and open this link: [localhost:8080/](localhost:8080/)
 
@@ -56,38 +60,37 @@ Jenkins will ask for Admin password. To get the password run docker command:
 ```commandline
 docker container logs toolshop
 ```
-Copy the password, enter it into administrator password field and click Continue button.
-At Customize Jenkins select option Install Selected plugins.
-Wait until Jenkins completes installation of plugins.
-At Create First Admin User screen populate Username, Password, Confirm Password, Full Name, E-mail address and click Save and Continue.
-At Instance Configuration click Save and Finish.
-At confirmation screen (Jenkins is ready!) click Start using Jenkins button.
+1. Copy the password, enter it into administrator password field and click Continue button.
+2. At Customize Jenkins select option Install Selected plugins. 
+3. Wait until Jenkins completes installation of plugins. 
+4. At Create First Admin User screen populate Username, Password, Confirm Password, Full Name, E-mail address and click Save and Continue. 
+5. At Instance Configuration click Save and Finish. 
+6. At confirmation screen (Jenkins is ready!) click Start using Jenkins button.
 
-Install Allure Plugin (required to run reports)
-At dashboard screen click Manage Jenkins.
-At Manage Jenkins screen click Plugins button. 
-At Plugins page click on Available plugins list. Use Search input to find Allure plugin.
-Check flag against Allure plugin and click Install button.
-Click on Installed plugins and confirm Allure plugin is in the list with Enabled flag.
+### Install Allure Plugin (required to run reports)
+1. At dashboard screen click Manage Jenkins.
+2. At Manage Jenkins screen click Plugins button. 
+3. At Plugins page click on Available plugins list. Use Search input to find Allure plugin.
+4. Check flag against Allure plugin and click Install button.
+5. Click on Installed plugins and confirm Allure plugin is in the list with Enabled flag.
 
-Install Allure Command Line (required to run reports)
-Open Manage Jenkins page. 
-Click on Tools item. 
-At Tools screen under Allure Commandline installations click Add Allure Commandline button.
-Populate Name field.
-Click Apply and Save buttons.
+### Install Allure Command Line (required to run reports)
+1. Open Manage Jenkins page. 
+2. Click on Tools item. 
+3. At Tools screen under Allure Commandline installations click Add Allure Commandline button.
+4. Populate Name field.
+5. Click Apply and Save buttons.
 
-Create new pipeline:
-Click New Item button.
-Populate item name.
-Select Pipeline item and click OK
-At configuration screen in Pipeline section set Definition option to Pipeline script from SCM.
-Set SCM option to Git.
-Populate Repository URL filed: https://github.com/isFrost/toolshop_test_automation.git
-In Branch Specifier field enter */main.
-Click Save button.
-Click Build Now to build the pipeline.
-
+### Create new pipeline
+1. Click New Item button.
+2. Populate item name.
+3. Select Pipeline item and click OK 
+4. At configuration screen in Pipeline section set Definition option to Pipeline script from SCM. 
+5. Set SCM option to Git. 
+6. Populate Repository URL filed: https://github.com/isFrost/toolshop_test_automation.git
+7. In Branch Specifier field enter */main. 
+8. Click Save button. 
+9. Click Build Now to build the pipeline.
 
 ## Project Structure
 
@@ -144,61 +147,63 @@ toolshop_test_automation/
 └── venv
 ```
 
+## Running Tests from command line
 
+To run the test from command line:
 
-Run the Docker container:
+1) Make sure python and pip are installed in the system.
+```commandline
+python3 --version
+```
+```commandline
+pip3 --version
+```
+2. Install dependencies from requirements.txt file. Navigate to project folder and enter command:
+```commandline
+pip install -r requirements.txt
+```
+3. create and activate virtual Python environment for your project. For example, the commands to create and activate a venv
+```commandline
+python -m venv .venv
+```
+```
+source .venv/bin/activate
+```
+3. To run the test enter command:
+```commandline
+python3 -m pytest tests/ --alluredir reports
+```
+4. To open generate allure report enter:
+```commandline
+allure serve reports
+```
+*Note: You many need to install Allure in venv to open generated reports in browser. Below is the example how to do it:*
+```commandline
+# Download and set up Allure command-line tool
 
-sh
-Copy code
-docker-compose up
-Execute the tests:
+VERSION=2.13.9  # Replace with the latest version
 
-sh
-Copy code
-docker exec -it selenium-container pytest --html=reports/test_report.html
-Continuous Integration
-This project uses Jenkins for continuous integration. The Jenkins pipeline is defined in the Jenkinsfile.
+wget https://github.com/allure-framework/allure2/releases/download/${VERSION}/allure-${VERSION}.tgz
 
-Set up a Jenkins job and configure it to use the repository.
+tar -zxvf allure-${VERSION}.tgz -C venv/
 
-The Jenkinsfile includes stages for building the Docker image, running the tests, and generating the test report.
+mv venv/allure-${VERSION} venv/allure
 
-groovy
-Copy code
-pipeline {
-    agent any
+# Add Allure to PATH
+echo 'export PATH="$VIRTUAL_ENV/allure/bin:$PATH"' >> venv/bin/activate
 
-    stages {
-        stage('Build') {
-            steps {
-                script {
-                    docker.build('selenium-test-framework')
-                }
-            }
-        }
+# Reload environment
+source venv/bin/activate
+```
+*Also note that allure will require Java Runtime to be installed in the system*
+## Notes
+Although Dockerfile is composed to detect CPU architecture and use proper browser it looks like webdrivers curently do not support linux/aarch64 combination. Workaround is not yet added to this project.
 
-        stage('Test') {
-            steps {
-                script {
-                    docker.image('selenium-test-framework').inside {
-                        sh 'pytest --html=reports/test_report.html'
-                    }
-                }
-            }
-        }
+## Contributing
 
-        stage('Report') {
-            steps {
-                publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'reports', reportFiles: 'test_report.html', reportName: 'Test Report'])
-            }
-        }
-    }
-}
-Contributing
+This is a test project build to improve knowledge of python/selenium automation skills. No contribution is required.
 
-Contributions are welcome! Please open an issue or submit a pull request for any changes.
-
-License
+## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
 
