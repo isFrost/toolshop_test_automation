@@ -3,4 +3,5 @@
 __pycache__/
 reports/
 logs/*.log
+*.log
 .DS_Store
